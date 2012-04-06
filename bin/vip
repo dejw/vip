@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Makes your python and pip aware of existing virtualenv underneath. In its
+design, it is inspired by Git and its way of handling its repositories.
+"""
+
+import sys, argparse
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('command', metavar='command', type=str, nargs='?', 
+        help='an executable in .vip/bin directory')
+    
+    parser.add_argument('arguments', type=str, nargs=argparse.REMAINDER, 
+        help='arguments passed to a given command')
+    
+    parser.add_argument('--init', dest='initialize', metavar="dir", nargs="?",
+                    help='initializes a brand new virtualenv in given `dir`, using current directory by default')
+    parser.add_argument('--locate', dest='locate', action='store_const', 
+        const=True, help='shows where the .vip directory is')            
+    parser.add_argument('--update', dest='update', action='store_const', 
+        const=True, help='updates the .vipdeps file')
+    parser.add_argument('--purge', dest='purge', action='store_const', 
+        const=True, help='removes the .vip directory')
+
+    return parser, parser.parse_args()
+
+def main():
+    parser, args = parse_args()
+
+if __name__ == "__main__":
+    main()
