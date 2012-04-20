@@ -1,6 +1,7 @@
-vip (Virtual Python) is a simple library that makes your `python` and `pip`
-aware of existing virtualenv underneath. In its design, it is inspired by Git 
-and its way of handling its repositories.
+`vip` is a simple library that makes your `python` and `pip` aware of existing
+virtualenv underneath. In its design, it is inspired by Git and its way of
+handling its repositories.
+
 
 ## Philosophy
 
@@ -8,15 +9,15 @@ In its concept `vip` is similar to `git`. It assumes that your virtualenv is
 located in `.vip` directory, somewhere in the directory structure of your 
 project.
 
-In addition to the `.vip` directory, `.vipdeps` file is created, which lists 
-all installed packages. Presence of this file allows to recreate virtualenv
-later. It is designed to be includes in source control.
+In addition to the `.vip` directory, `requirements.txt` file is created, which
+lists all installed packages. Presence of this file allows to recreate
+virtualenv later. It is highly recommended to be included in source control.
 
-The `.vipdeps` file is updated anytime you install a package in environment. 
-In order to keep things simple, it has a format of requirements file used by
-`pip`.
+The `requirements.txt` file is updated anytime you install a package in
+environment.
 
-No need to source `bin/activate` file any more!
+No need to source `bin/activate` any more!
+
 
 ## Usage
 
@@ -24,9 +25,9 @@ Initialization of a brand new virtual environment is as simple as typing:
 
     vip --init [directory]
 
-In addition, `init` command automatically detects presence of `.vipdeps` file
-and installs all packages listed inside, which is useful, when you checkout a
-new repository somewhere, and you want to recreate the environment.
+In addition, `init` command automatically detects presence of `requirements.txt`
+file and installs all packages listed inside, which is useful, when you
+checkout a new repository somewhere, and you want to recreate the environment.
 
 When you want to use Python interpreter from your environment, just prefix it
 with `vip`:
@@ -56,16 +57,19 @@ You can get rid of a virtual environment by typing:
 
     vip --purge   # equivalent of rm -rf .vip
 
-### Updating `.vipdeps` file
+### Updating `requirements.txt` file
 
 In most common case dependency listing is updated automatically, so whenever
-you run `vip pip (un)install` or `vip easy_install` command, `.vipdeps` file is
-updated on successful completion.
+you run `vip pip (un)install` or `vip easy_install` command, `requirements.txt`
+file is updated on successful completion.
 
 In case your dependencies changed in some other way, you can update dependency
 listing by typing:
 
-    vip --update   # which is roughly equivalent to vip pip freeze > .vipdeps
+    vip --update   # which is roughly equivalent to
+                   #   vip pip freeze > requirements.txt
+
+Do not forget to include this file in next commit!
 
 
 ## Too much typing?
@@ -78,13 +82,14 @@ with `vip`. Add this to your `~/.bashrc` file:
 
 Note, that it will fail when there will be no `.vip` directory up to the root.
 
+
 ## Use-cases
 
 ### No root privileges
 
-You can type `vip init` in your home directory, add aliases to your `~/.bashrc` 
-file and enjoy the new way of working with `python` and `pip` in a shell, where 
-you cannot install packages globally in the system.
+You can type `vip --init` in your home directory, add aliases to your
+`~/.bashrc` file and enjoy the new way of working with `python` and `pip` in a
+shell, where you cannot install packages globally in the system.
 
 `rvm` does the same thing. 
 
@@ -97,12 +102,14 @@ for `virtualenv`.
 In addition, You can actually use `.vipdeps` file as your install requirements
 source for `setup.py` script. 
 
+
 ## Installation
 
 Simply type the following command into terminal to install the latest released
 version:
 
     pip install vip
+
 
 ## Contribution
 
