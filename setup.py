@@ -3,18 +3,19 @@
 import sys
 import os
 
-
 from setuptools import setup, find_packages
 
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
+if sys.version_info < (2, 7):
+    requirements.append('argparse')
+
 
 def get_info():
     import vip
     return vip.VERSION, vip.__doc__.strip()
-
 
 version, long_description = get_info()
 
