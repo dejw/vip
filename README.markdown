@@ -49,7 +49,7 @@ You can find out where your environment is by typing:
 
 which is useful for locating Python interpreter, and running it from shell:
 
-    time `vip --locate`/python script.py
+    time `vip --locate`/bin/python script.py
 
 In this case, performance of interpreter execution will not be affected at all.
 
@@ -77,8 +77,8 @@ Do not forget to include this file in next commit!
 You can alias most frequently used commands to stop prefixing them constantly 
 with `vip`. Add this to your `~/.bashrc` file:
 
-    alias python="vip python"
-    alias pip="vip pip"
+    alias python="`vip -l`/bin/python"
+    alias pip="`vip -l`/bin/pip"
 
 Note, that it will fail when there will be no `.vip` directory up to the root.
 
@@ -95,13 +95,27 @@ shell, where you cannot install packages globally in the system.
 
 ### Self-contained projects
 
-`.vipdeps` file allows to recreate environment when the project location 
-changes, which is a simple workaround for experimental `--relocatable` option 
-for `virtualenv`.
+`requirements.txt` file allows to recreate environment when the project
+location  changes, which is a simple workaround for experimental
+`--relocatable` option for `virtualenv`.
 
-In addition, You can actually use `.vipdeps` file as your install requirements
-source for `setup.py` script. 
+In addition, You can actually use `requirements.txt` file as your install
+requirements source for `setup.py` script. 
 
+
+## Limitations
+
+To keep things simple, vip does not allow for user interactions with a child
+process, so you cannot use interactive Python shell. 
+
+Simple workaround:
+
+    `vip -l`/bin/python
+
+Also, any pip uninstallations will fail, because user has to confirm deletion.
+You can bypass this issue simply adding `-y` switch to uninstall command:
+
+    vip pip uninstall -y tornado
 
 ## Installation
 
