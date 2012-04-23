@@ -1,1 +1,4 @@
+# Only development dependencies
 virtualenv>=1.7
+argparse
+mox

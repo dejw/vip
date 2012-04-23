@@ -5,9 +5,8 @@ import os
 
 from setuptools import setup, find_packages
 
-
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
+#  Build requirements list
+requirements = ['virtualenv>=1.7']
 
 if sys.version_info < (2, 7):
     requirements.append('argparse')
