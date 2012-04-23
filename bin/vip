@@ -1,85 +1,82 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-Makes your python and pip aware of existing virtualenv underneath. In its
-design, it is inspired by Git and its way of handling its repositories.
-"""
-
-import sys
 import argparse
 import contextlib
 
-from os import path
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/.."))
 
-sys.path.insert(0, path.abspath(path.dirname(__file__) + "/.."))
-
-
+import vip
 from vip import core
 
 
 @contextlib.contextmanager
-def protect_from_VipError(args, message):
+def protect_from_VipError():
     try:
         yield
     except core.VipError as e:
-        if args.verbose:
-            core.logger.exception(message)
-        else:
-            print str(e)
+        core.logger.exception("fatal: " + str(e))
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description=__doc__)
+def create_argument_parser():
+    usage = """
+  %(prog)s command ...
+  %(prog)s --init [directory]
+  %(prog)s --locate [directory]
+"""
+
+    parser = argparse.ArgumentParser(description=vip.__doc__, usage=usage)
+
+    # Command execution
     parser.add_argument('command', metavar='command', type=str, nargs='?',
         help='an executable in .vip/bin directory')
 
     parser.add_argument('arguments', type=str, nargs=argparse.REMAINDER,
         help='arguments passed to a given command')
 
-    parser.add_argument('--init', dest='init', metavar="dir", nargs="?",
-                    const=".",
-                    help='initializes a brand new virtualenv in given `dir`, '
-                         'using current directory by default')
+    parser.add_argument('-i', '--init', dest="init", metavar="directory",
+        nargs="?", const=".", help='initializes a brand new virtualenv in '
+        'given directory, using "." by default')
 
-    parser.add_argument('--locate', dest='locate', metavar="dir", nargs="?",
-                    const=".", help='shows where the .vip directory is')
-
-    #parser.add_argument('--update', dest='update', action='store_true',
-    #    help='updates the .vipdeps file')
-    #parser.add_argument('--purge', dest='purge', action='store_true',
-    #    help='removes the .vip directory')
+    parser.add_argument('-l', '--locate', metavar="directory",
+        nargs="?", const=".", help='shows where the .vip directory is')
 
     parser.add_argument('-v', '--verbose', action='store_true',
-                        help='verbose error messages')
+            help='verbose error messages')
 
     return parser, parser.parse_args()
 
 
 def main():
-    parser, args = parse_args()
+    parser, args = create_argument_parser()
 
-    commands = ['init', 'locate', 'update', 'purge']
+    commands = ['init', 'locate', 'command']
 
-    if args.init:
-        with protect_from_VipError(args, "Error during virtualenv init"):
+    # Configure logger using --verbose option
+    core.logger.verbose = bool(args.verbose)
+
+    with protect_from_VipError():
+
+        # Check for only one command
+        used_commands = [int(bool(getattr(args, cmd))) for cmd in commands]
+        if sum(used_commands) > 1:
+            parser.print_help()
+
+        elif args.init:
             directory = core.create_virtualenv(args.init)
+            core.logger.info("Initialized virtualenv in %s" % directory)
 
-            if directory:
-                print "Initialized virtualenv in %s" % directory
-
-    elif args.locate:
-        with protect_from_VipError(args, "Error during locating virtualenv"):
+        elif args.locate:
             print core.find_vip_directory(args.locate)
 
-    elif args.command:
-        with protect_from_VipError(args, "Error during executing command"):
+        elif args.command:
             directory = core.find_vip_directory()
             core.execute_virtualenv_command(directory, args.command,
                                             args.arguments)
 
-    else:
-        parser.print_help()
+        else:
+            parser.print_help()
 
 
 if __name__ == "__main__":

@@ -1,33 +1,26 @@
 # -*- coding: utf-8 -*-
 
-"""
-vip (Virtual Python) is a simple library that makes your python and pip aware
-of existing virtualenv underneath. In its design, it is inspired by Git and its
-way of handling its repositories.
-"""
 
 import sys
 import os
 
 from setuptools import setup, find_packages
 
-def get_version():
-    basedir = os.path.dirname(__file__)
-    with open(os.path.join(basedir, 'vip/__init__.py')) as f:
-        VERSION = None
-        exec(f.read())
-        return VERSION
-    raise RuntimeError('No version info found.')
+def get_info():
+    import vip
+    return vip.VERSION, vip.__doc__.strip()
+
+version, long_description = get_info()
 
 setup(
     name='vip',
-    version=get_version(),
+    version=version,
     url='https://github.com/dejw/vip/',
     license='BSD',
     author='Dawid Fatyga',
     author_email='dawid.fatyga@gmail.com',
     description='vip is a simple library that makes your python aware of existing virtualenv underneath.',
-    long_description=__doc__,
+    long_description=long_description,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,

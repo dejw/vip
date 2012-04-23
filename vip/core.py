@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import os
 import subprocess
+import logging
 import sys
 import StringIO
 import virtualenv
@@ -14,8 +14,24 @@ VIP_DIRECTORY = ".vip"
 REQUIREMENTS_FILENAME = 'requirements.txt'
 
 
-logging.basicConfig(format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+class _Logger(object):
+
+    def __init__(self):
+        self._logger = logging.getLogger(__name__)
+        self._logger.addHandler(logging.StreamHandler())
+        self._logger.setLevel(logging.INFO)
+
+    def exception(self, *args, **kwargs):
+        if self.verbose:
+            self._logger.exception(*args, **kwargs)
+        else:
+            self.error(*args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self._logger, name)
+
+
+logger = _Logger()
 
 
 class VipError(StandardError):
@@ -72,17 +88,19 @@ def create_virtualenv(directory=".", install_requirements=True):
         virtualenv.create_environment(vip_directory)
 
     else:
-        logger.warning("found %s directory, assuming it is "
+        logger.warning("Found %s directory, assuming it is "
                         "a virtualenv" % vip_directory)
 
     # Let's assume that if .vip is directory it is also our virtualenv
     if path.exists(vip_directory) and not path.isdir(vip_directory):
-        raise VipError("found %s which is not a directory" % vip_directory)
+        raise VipError("%s is not a directory" % vip_directory)
 
     # if requirements.txt exists try to install all packages
     if install_requirements:
         requirements_file = path.join(directory, REQUIREMENTS_FILENAME)
         if path.exists(requirements_file) and path.isfile(requirements_file):
+
+            logger.info("Installing requirements from %s" % requirements_file)
             execute_virtualenv_command(vip_directory, "pip", ["install", "-r",
                 requirements_file])
 
@@ -107,7 +125,6 @@ def execute_virtualenv_command(vip_directory, command, args):
                 stdout=sys.stdout, stderr=sys.stderr, stdin=subprocess.PIPE)
         p.stdin.close()
         p.communicate()
-
     except subprocess.CalledProcessError as e:
         raise VipError(str(e))
     except KeyboardInterrupt:
