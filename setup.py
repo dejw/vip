@@ -3,7 +3,12 @@
 import sys
 import os
 
+
 from setuptools import setup, find_packages
+
+
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 
 def get_info():
@@ -23,10 +28,9 @@ setup(
     description='vip is a simple library that makes your python aware of existing virtualenv underneath.',
     long_description=long_description,
     packages=find_packages(),
-    include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=["virtualenv==1.7"],
+    install_requires=requirements,
     scripts=['bin/vip'],
     classifiers=[
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
