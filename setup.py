@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-
 import sys
 import os
 
 from setuptools import setup, find_packages
 
+
 def get_info():
     import vip
     return vip.VERSION, vip.__doc__.strip()
+
 
 version, long_description = get_info()
 

@@ -96,7 +96,3 @@ class TestCommandExecution(unittest.TestCase):
                 ["-arg", "123"])
 
         self.mox.VerifyAll()
-
-
-if __name__ == "__main__":
-    unittest.main()
