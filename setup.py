@@ -31,7 +31,11 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=requirements,
-    scripts=['bin/vip'],
+    entry_points={
+        'console_scripts': [
+            'vip = vip.main:main',
+        ]
+    },
     classifiers=[
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 1 - Planning',

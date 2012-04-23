@@ -1,11 +1,8 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import argparse
 import contextlib
-
-import sys, os
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/.."))
+import sys
 
 import vip
 from vip import core
@@ -45,6 +42,9 @@ def create_argument_parser():
     parser.add_argument('-v', '--verbose', action='store_true',
             help='verbose error messages')
 
+    parser.add_argument('-V', '--version', action='store_true',
+            help='prints version and exits')
+
     return parser, parser.parse_args()
 
 
@@ -57,6 +57,10 @@ def main():
     core.logger.verbose = bool(args.verbose)
 
     with protect_from_VipError():
+
+        if args.version:
+            print vip.VERSION
+            sys.exit(0)
 
         # Check for only one command
         used_commands = [int(bool(getattr(args, cmd))) for cmd in commands]
