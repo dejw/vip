@@ -1,4 +1,9 @@
 # Only development dependencies
 virtualenv>=1.7
-argparse
+
+# Tests
 mox
+
+# For python 2.6 and less
+argparse
+unittest2
