@@ -4,6 +4,7 @@ import logging
 import os
 import subprocess
 import sys
+import StringIO
 import virtualenv
 
 from os import path
@@ -71,7 +72,8 @@ def create_virtualenv(directory=".", install_requirements=True):
         virtualenv.create_environment(vip_directory)
 
     else:
-        logger.warning("Found %s directory, assuming it is a virtualenv" % vip_directory)
+        logger.warning("found %s directory, assuming it is "
+                        "a virtualenv" % vip_directory)
 
     # Let's assume that if .vip is directory it is also our virtualenv
     if path.exists(vip_directory) and not path.isdir(vip_directory):
@@ -100,6 +102,14 @@ def execute_virtualenv_command(vip_directory, command, args):
 
     try:
         arguments = [executable_path] + args
-        subprocess.check_call(arguments, stdout=sys.stdout, stderr=sys.stderr)
+
+        p = subprocess.Popen(arguments,
+                stdout=sys.stdout, stderr=sys.stderr, stdin=subprocess.PIPE)
+        p.stdin.close()
+        p.communicate()
+
     except subprocess.CalledProcessError as e:
         raise VipError(str(e))
+    except KeyboardInterrupt:
+        # Ignore keyboard interrupt here
+        pass
