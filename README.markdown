@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/dejw/vip.png)](http://travis-ci.org/dejw/vip)
+
 `vip` is a simple library that makes your `python` and `pip` aware of existing
 virtualenv underneath. In its design, it is inspired by Git and its way of
 handling its repositories.
