@@ -6,4 +6,4 @@ virtualenv underneath. In its design, it is inspired by Git and its way of
 handling its repositories.
 """
 
-VERSION = "0.1.1"
+VERSION = "0.1.2"
