@@ -56,7 +56,7 @@ def find_vip_directory(start="."):
     """
     directory, head = path.abspath(start), None
 
-    while directory != "/" or head:
+    while (directory != "/" and directory[1:] != ':\\' and directory[1:] != ':/') or head:
         vip_directory = path.join(directory, VIP_DIRECTORY)
 
         if path.exists(vip_directory) and path.isdir(vip_directory):
