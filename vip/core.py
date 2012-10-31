@@ -56,7 +56,8 @@ def find_vip_directory(start="."):
     """
     directory, head = path.abspath(start), None
 
-    while (directory != "/" and directory[1:] != ':\\' and directory[1:] != ':/') or head:
+    while (directory != "/" and directory[1:] != ':\\'
+           and directory[1:] != ':/') or head:
         vip_directory = path.join(directory, VIP_DIRECTORY)
 
         if path.exists(vip_directory) and path.isdir(vip_directory):
@@ -89,7 +90,7 @@ def create_virtualenv(directory=".", install_requirements=True):
 
     else:
         logger.warning("Found %s directory, assuming it is "
-                        "a virtualenv" % vip_directory)
+                       "a virtualenv" % vip_directory)
 
     # Let's assume that if .vip is directory it is also our virtualenv
     if path.exists(vip_directory) and not path.isdir(vip_directory):
@@ -102,7 +103,7 @@ def create_virtualenv(directory=".", install_requirements=True):
 
             logger.info("Installing requirements from %s" % requirements_file)
             execute_virtualenv_command(vip_directory, "pip", ["install", "-r",
-                requirements_file])
+                                       requirements_file])
 
     return vip_directory
 
@@ -121,8 +122,8 @@ def execute_virtualenv_command(vip_directory, command, args):
     try:
         arguments = [executable_path] + args
 
-        p = subprocess.Popen(arguments,
-                stdout=sys.stdout, stderr=sys.stderr, stdin=subprocess.PIPE)
+        p = subprocess.Popen(arguments, stdout=sys.stdout, stderr=sys.stderr,
+                             stdin=subprocess.PIPE)
         p.stdin.close()
         p.communicate()
     except subprocess.CalledProcessError as e:

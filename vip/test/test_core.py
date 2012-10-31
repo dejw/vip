@@ -30,7 +30,7 @@ class TestVipDirectoryFinder(unittest.TestCase):
 
     def test_should_return_absolute_path_to_vip_directory(self):
         start = path.join(path.dirname(__file__), "fixtures", "test1", "..",
-            "test1")
+                          "test1")
 
         directory = core.find_vip_directory(start=start)
 
@@ -69,8 +69,8 @@ class TestCommandExecution(unittest.TestCase):
 
         (subprocess
             .Popen([EndsWith("test1/.vip/bin/command"), "-arg", "123"],
-                stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
-                stdin=subprocess.PIPE)
+                   stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
+                   stdin=subprocess.PIPE)
             .AndReturn(self.popen_mock))
 
     def tearDown(self):
@@ -87,7 +87,7 @@ class TestCommandExecution(unittest.TestCase):
         self.mox.ReplayAll()
 
         core.execute_virtualenv_command(self.vip_dir, "command",
-                ["-arg", "123"])
+                                        ["-arg", "123"])
 
         self.mox.VerifyAll()
 
@@ -98,6 +98,6 @@ class TestCommandExecution(unittest.TestCase):
 
         with self.assertRaises(core.VipError):
             core.execute_virtualenv_command(self.vip_dir, "command",
-                ["-arg", "123"])
+                                            ["-arg", "123"])
 
         self.mox.VerifyAll()

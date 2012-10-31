@@ -27,23 +27,25 @@ def create_argument_parser():
 
     # Command execution
     parser.add_argument('command', metavar='command', type=str, nargs='?',
-        help='an executable in .vip/bin directory')
+                        help='an executable in .vip/bin directory')
 
     parser.add_argument('arguments', type=str, nargs=argparse.REMAINDER,
-        help='arguments passed to a given command')
+                        help='arguments passed to a given command')
 
     parser.add_argument('-i', '--init', dest="init", metavar="directory",
-        nargs="?", const=".", help='initializes a brand new virtualenv in '
-        'given directory, using "." by default')
+                        nargs="?", const=".",
+                        help='initializes a brand new virtualenv in '
+                        'given directory, using "." by default')
 
     parser.add_argument('-l', '--locate', metavar="directory",
-        nargs="?", const=".", help='shows where the .vip directory is')
+                        nargs="?", const=".",
+                        help='shows where the .vip directory is')
 
     parser.add_argument('-v', '--verbose', action='store_true',
-            help='verbose error messages')
+                        help='verbose error messages')
 
     parser.add_argument('-V', '--version', action='store_true',
-            help='prints version and exits')
+                        help='prints version and exits')
 
     return parser, parser.parse_args()
 
