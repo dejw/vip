@@ -7,38 +7,53 @@ handling its repositories.
 
 ## Philosophy
 
-In its concept `vip` is similar to `git`. It assumes that your virtualenv is 
-located in `.vip` directory, somewhere in the directory structure of your 
+In its concept `vip` is similar to `git`. It assumes that your virtualenv is
+located in `.vip` directory, somewhere in the directory structure of your
 project.
 
-In addition to the `.vip` directory, `requirements.txt` file is created, which
-lists all installed packages. Presence of this file allows to recreate
-virtualenv later. It is highly recommended to be included in source control.
-
-The `requirements.txt` file is updated anytime you install a package in
-environment.
+In addition to the `.vip` directory, it uses `requirements.txt` file, which
+should list all dependent packages. Presence of this file allows to recreate
+virtualenv later. It is should be included in a source control.
 
 No need to source `bin/activate` any more!
-
 
 ## Usage
 
 Initialization of a brand new virtual environment is as simple as typing:
 
-    vip --init [directory]
+    vip init [directory]
 
 In addition, `init` command automatically detects presence of `requirements.txt`
 file and installs all packages listed inside, which is useful, when you
 checkout a new repository somewhere, and you want to recreate the environment.
 
+Installing new packages can be done in two ways. After an update of your
+'requirements.txt' file, you can run:
+
+    vip install
+
+to instruct vip to pick up packages from it. Basically, all it does is running:
+
+    pip install -r requirements.txt
+
+on your environment.
+
+Also, you can also install packages individually:
+
+    vip install requests fabric -i http://example.my.pypi/simple
+
+To uninstall a package type:
+
+    vip uninstall Package
+
+With install/uninstall commands you can use any flag that is available in
+corresponding pip install/uninstall commands.
+
+
 When you want to use Python interpreter from your environment, just prefix it
 with `vip`:
 
     vip python -c "print 'Hi!'"
-
-`pip` command is available in the same way:
-
-    vip pip install requests fabric -i http://example.my.pypi/simple
 
 In fact any command located in `.vip/bin` is available simply by prefixing its
 name with `vip`. `vip` searches for `.vip` directory along the path up to the
@@ -47,40 +62,38 @@ desired executable inside `bin` directory.
 
 You can find out where your environment is by typing:
 
-    vip --locate
+    vip locate
 
 which is useful for locating Python interpreter, and running it from shell:
 
-    time `vip --locate`/bin/python script.py
+    time `vip locate`/bin/python script.py
 
 In this case, performance of interpreter execution will not be affected at all.
 
 You can get rid of a virtual environment by typing:
 
-    vip --purge   # equivalent of rm -rf .vip
+    vip purge   # equivalent of rm -rf .vip
 
-### Updating `requirements.txt` file
+### Managing dependencies
 
-In most common case dependency listing is updated automatically, so whenever
-you run `vip pip (un)install` or `vip easy_install` command, `requirements.txt`
-file is updated on successful completion.
+Your direct dependencies should be listed in `requirements.txt` file, but every
+time you install something using `(un)install` command `requirements.freeze.txt`
+file is updated.
 
-In case your dependencies changed in some other way, you can update dependency
-listing by typing:
+The contents of this file is roughly equivalent to the output of:
 
-    vip --update   # which is roughly equivalent to
-                   #   vip pip freeze > requirements.txt
+    vip pip --freeze > requirements.freeze.txt
 
 Do not forget to include this file in next commit!
 
 
 ## Too much typing?
 
-You can alias most frequently used commands to stop prefixing them constantly 
+You can alias most frequently used commands to stop prefixing them constantly
 with `vip`. Add this to your `~/.bashrc` file:
 
-    alias python="`vip -l`/bin/python"
-    alias pip="`vip -l`/bin/pip"
+    alias python="`vip l`/bin/python"
+    alias pip="`vip l`/bin/pip"
 
 Note, that it will fail when there will be no `.vip` directory up to the root.
 
@@ -89,11 +102,11 @@ Note, that it will fail when there will be no `.vip` directory up to the root.
 
 ### No root privileges
 
-You can type `vip --init` in your home directory, add aliases to your
+You can type `vip init` in your home directory, add aliases to your
 `~/.bashrc` file and enjoy the new way of working with `python` and `pip` in a
 shell, where you cannot install packages globally in the system.
 
-`rvm` does the same thing. 
+`rvm` does the same thing.
 
 ### Self-contained projects
 
@@ -102,13 +115,13 @@ location  changes, which is a simple workaround for experimental
 `--relocatable` option for `virtualenv`.
 
 In addition, You can actually use `requirements.txt` file as your install
-requirements source for `setup.py` script. 
+requirements source for `setup.py` script.
 
 
 ## Limitations
 
 To keep things simple, vip does not allow for user interactions with a child
-process, so you cannot use interactive Python shell. 
+process, so you cannot use interactive Python shell.
 
 Simple workaround:
 
@@ -118,6 +131,7 @@ Also, any pip uninstallations will fail, because user has to confirm deletion.
 You can bypass this issue simply adding `-y` switch to uninstall command:
 
     vip pip uninstall -y tornado
+    vip uninstall tornado       # -y is implied
 
 ## Installation
 
