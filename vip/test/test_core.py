@@ -9,7 +9,7 @@ except ImportError:
     import unittest
 
 
-from os import path
+from os import path, name as osname
 
 from vip import core
 
@@ -101,3 +101,57 @@ class TestCommandExecution(unittest.TestCase):
                                             ["-arg", "123"])
 
         self.mox.VerifyAll()
+
+
+if osname == 'nt':
+    class TestWindowsVipDirectoryFinder(unittest.TestCase):
+
+        def setUp(self):
+            drive, folderpath = path.splitdrive(path.abspath(path.dirname(__file__)))
+
+            # The test root folder with a backslash following the drive letter. (C:\\)
+            self.rootbs = path.join(drive, '\\' + folderpath[1:])
+            # The test root folder with a slash following the drive letter. (C:/)
+            self.rootfs = path.join(drive, '/' + folderpath[1:])
+
+        def test_should_return_absolute_path_to_vip_directory_backslash(self):
+            start = path.join(self.rootbs, "fixtures", "test1", "..", "test1")
+
+            directory = core.find_vip_directory(start=start)
+
+            self.assertEqual(path.abspath(path.join(start, ".vip")), directory)
+
+        def test_should_return_absolute_path_to_vip_directory_slash(self):
+            start = path.join(self.rootfs, "fixtures", "test1", "..", "test1")
+
+            directory = core.find_vip_directory(start=start)
+
+            self.assertEqual(path.abspath(path.join(start, ".vip")), directory)
+
+        def test_should_skip_vip_which_is_no_directory_backslash(self):
+            root = path.join(self.rootbs, "fixtures", "test2")
+
+            directory = core.find_vip_directory(start=path.join(root,
+                                                                "with_plain_file"))
+            vip_folder = path.abspath(path.join(root, ".vip"))
+            self.assertEqual(vip_folder, directory)
+
+        def test_should_skip_vip_which_is_no_directory_slash(self):
+            root = path.join(self.rootfs, "fixtures", "test2")
+
+            directory = core.find_vip_directory(start=path.join(root,
+                                                                "with_plain_file"))
+            vip_folder = path.abspath(path.join(root, ".vip"))
+            self.assertEqual(vip_folder, directory)
+
+        def test_should_raise_VipError_when_no_vip_is_found_backslash(self):
+            root = path.join(self.rootbs, "fixtures", "test3")
+
+            with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
+                core.find_vip_directory(start=root)
+
+        def test_should_raise_VipError_when_no_vip_is_found_slash(self):
+            root = path.join(self.rootfs, "fixtures", "test3")
+
+            with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
+                core.find_vip_directory(start=root)
