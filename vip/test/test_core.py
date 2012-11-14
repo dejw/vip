@@ -105,6 +105,7 @@ class TestWindowsVipDirectoryFinder(unittest.TestCase):
         with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
             core.find_vip_directory(start=root)
 
+
 @unittest.skipUnless(core.is_win, "Windows-specific test")
 class TestWindowsCommandExecution(unittest.TestCase):
 
@@ -156,6 +157,7 @@ class TestWindowsCommandExecution(unittest.TestCase):
                                             ["-arg", "123"])
 
         self.mox.VerifyAll()
+
 
 @unittest.skipIf(core.is_win, "POSIX-specific test")
 class TestCommandExecution(unittest.TestCase):
