@@ -51,158 +51,160 @@ class TestVipDirectoryFinder(unittest.TestCase):
             core.find_vip_directory(start=root)
 
 
-if osname == 'nt':
-    class TestWindowsVipDirectoryFinder(unittest.TestCase):
+@unittest.skipUnless(core.is_win, "Windows-specific test")
+class TestWindowsVipDirectoryFinder(unittest.TestCase):
 
-        def setUp(self):
-            drive, folderpath = path.splitdrive(
-                path.abspath(path.dirname(__file__)))
+    def setUp(self):
+        drive, folderpath = path.splitdrive(
+            path.abspath(path.dirname(__file__)))
 
-            # The test root folder with a backslash following the drive letter.
-            # In normal circumstances, C:\
-            self.rootbs = path.join(drive, '\\' + folderpath[1:])
-            # The test root folder with a slash following the drive letter.
-            # In normal circumstances, C:/
-            self.rootfs = path.join(drive, '/' + folderpath[1:])
+        # The test root folder with a backslash following the drive letter.
+        # In normal circumstances, C:\
+        self.rootbs = path.join(drive, '\\' + folderpath[1:])
+        # The test root folder with a slash following the drive letter.
+        # In normal circumstances, C:/
+        self.rootfs = path.join(drive, '/' + folderpath[1:])
 
-        def test_should_return_absolute_path_to_vip_directory_backslash(self):
-            start = path.join(self.rootbs, "fixtures", "test1", "..", "test1")
+    def test_should_return_absolute_path_to_vip_directory_backslash(self):
+        start = path.join(self.rootbs, "fixtures", "test1", "..", "test1")
 
-            directory = core.find_vip_directory(start=start)
+        directory = core.find_vip_directory(start=start)
 
-            self.assertEqual(path.abspath(path.join(start, ".vip")), directory)
+        self.assertEqual(path.abspath(path.join(start, ".vip")), directory)
 
-        def test_should_return_absolute_path_to_vip_directory_slash(self):
-            start = path.join(self.rootfs, "fixtures", "test1", "..", "test1")
+    def test_should_return_absolute_path_to_vip_directory_slash(self):
+        start = path.join(self.rootfs, "fixtures", "test1", "..", "test1")
 
-            directory = core.find_vip_directory(start=start)
+        directory = core.find_vip_directory(start=start)
 
-            self.assertEqual(path.abspath(path.join(start, ".vip")), directory)
+        self.assertEqual(path.abspath(path.join(start, ".vip")), directory)
 
-        def test_should_skip_vip_which_is_no_directory_backslash(self):
-            root = path.join(self.rootbs, "fixtures", "test2")
-            start = path.join(root, "with_plain_file")
-            directory = core.find_vip_directory(start=start)
-            vip_folder = path.abspath(path.join(root, ".vip"))
-            self.assertEqual(vip_folder, directory)
+    def test_should_skip_vip_which_is_no_directory_backslash(self):
+        root = path.join(self.rootbs, "fixtures", "test2")
+        start = path.join(root, "with_plain_file")
+        directory = core.find_vip_directory(start=start)
+        vip_folder = path.abspath(path.join(root, ".vip"))
+        self.assertEqual(vip_folder, directory)
 
-        def test_should_skip_vip_which_is_no_directory_slash(self):
-            root = path.join(self.rootfs, "fixtures", "test2")
-            start = path.join(root, "with_plain_file")
-            directory = core.find_vip_directory(start=start)
-            vip_folder = path.abspath(path.join(root, ".vip"))
-            self.assertEqual(vip_folder, directory)
+    def test_should_skip_vip_which_is_no_directory_slash(self):
+        root = path.join(self.rootfs, "fixtures", "test2")
+        start = path.join(root, "with_plain_file")
+        directory = core.find_vip_directory(start=start)
+        vip_folder = path.abspath(path.join(root, ".vip"))
+        self.assertEqual(vip_folder, directory)
 
-        def test_should_raise_VipError_when_no_vip_is_found_backslash(self):
-            root = path.join(self.rootbs, "fixtures", "test3")
+    def test_should_raise_VipError_when_no_vip_is_found_backslash(self):
+        root = path.join(self.rootbs, "fixtures", "test3")
 
-            with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
-                core.find_vip_directory(start=root)
+        with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
+            core.find_vip_directory(start=root)
 
-        def test_should_raise_VipError_when_no_vip_is_found_slash(self):
-            root = path.join(self.rootfs, "fixtures", "test3")
+    def test_should_raise_VipError_when_no_vip_is_found_slash(self):
+        root = path.join(self.rootfs, "fixtures", "test3")
 
-            with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
-                core.find_vip_directory(start=root)
+        with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
+            core.find_vip_directory(start=root)
 
-    class TestWindowsCommandExecution(unittest.TestCase):
+@unittest.skipUnless(core.is_win, "Windows-specific test")
+class TestWindowsCommandExecution(unittest.TestCase):
 
-        def setUp(self):
-            self.mox = mox.Mox()
+    def setUp(self):
+        self.mox = mox.Mox()
 
-            self.mox.StubOutWithMock(subprocess, "Popen")
+        self.mox.StubOutWithMock(subprocess, "Popen")
 
-            self.popen_mock = self.mox.CreateMockAnything("popen")
-            self.popen_mock.stdin = self.mox.CreateMockAnything("stdin")
+        self.popen_mock = self.mox.CreateMockAnything("popen")
+        self.popen_mock.stdin = self.mox.CreateMockAnything("stdin")
 
-            # Assert that stdin is closed
-            self.popen_mock.stdin.close()
+        # Assert that stdin is closed
+        self.popen_mock.stdin.close()
 
-            dirname = path.dirname(__file__)
-            self.vip_dir = path.join(dirname, "fixtures", "test4", ".vip")
-            command = "test4\\.vip\\Scripts\\command"
-            (subprocess
-                .Popen([EndsWith(command), "-arg", "123"],
-                       stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
-                       stdin=subprocess.PIPE)
-                .AndReturn(self.popen_mock))
+        dirname = path.dirname(__file__)
+        self.vip_dir = path.join(dirname, "fixtures", "test4", ".vip")
+        command = "test4\\.vip\\Scripts\\command"
+        (subprocess
+            .Popen([EndsWith(command), "-arg", "123"],
+                   stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
+                   stdin=subprocess.PIPE)
+            .AndReturn(self.popen_mock))
 
-        def tearDown(self):
-            self.mox.ResetAll()
-            self.mox.UnsetStubs()
+    def tearDown(self):
+        self.mox.ResetAll()
+        self.mox.UnsetStubs()
 
-        def test_should_raise_VipError_when_command_is_not_found(self):
+    def test_should_raise_VipError_when_command_is_not_found(self):
 
-            with self.assertRaisesRegexp(core.VipError, "not found"):
-                core.execute_virtualenv_command("missing\\.vip", "command", [])
+        with self.assertRaisesRegexp(core.VipError, "not found"):
+            core.execute_virtualenv_command("missing\\.vip", "command", [])
 
-        def test_should_call_command(self):
-            self.popen_mock.communicate()
-            self.mox.ReplayAll()
+    def test_should_call_command(self):
+        self.popen_mock.communicate()
+        self.mox.ReplayAll()
 
+        core.execute_virtualenv_command(self.vip_dir, "command",
+                                        ["-arg", "123"])
+
+        self.mox.VerifyAll()
+
+    def test_should_raise_VipError_when_CalledProcessError_is_found(self):
+        (self.popen_mock.communicate()
+            .AndRaise(subprocess.CalledProcessError(1, "error")))
+        self.mox.ReplayAll()
+
+        with self.assertRaises(core.VipError):
             core.execute_virtualenv_command(self.vip_dir, "command",
                                             ["-arg", "123"])
 
-            self.mox.VerifyAll()
+        self.mox.VerifyAll()
 
-        def test_should_raise_VipError_when_CalledProcessError_is_found(self):
-            (self.popen_mock.communicate()
-                .AndRaise(subprocess.CalledProcessError(1, "error")))
-            self.mox.ReplayAll()
+@unittest.skipIf(core.is_win, "POSIX-specific test")
+class TestCommandExecution(unittest.TestCase):
 
-            with self.assertRaises(core.VipError):
-                core.execute_virtualenv_command(self.vip_dir, "command",
-                                                ["-arg", "123"])
+    def setUp(self):
+        self.mox = mox.Mox()
 
-            self.mox.VerifyAll()
-else:
-    class TestCommandExecution(unittest.TestCase):
+        self.mox.StubOutWithMock(subprocess, "Popen")
 
-        def setUp(self):
-            self.mox = mox.Mox()
+        self.popen_mock = self.mox.CreateMockAnything("popen")
+        self.popen_mock.stdin = self.mox.CreateMockAnything("stdin")
 
-            self.mox.StubOutWithMock(subprocess, "Popen")
+        # Assert that stdin is closed
+        self.popen_mock.stdin.close()
 
-            self.popen_mock = self.mox.CreateMockAnything("popen")
-            self.popen_mock.stdin = self.mox.CreateMockAnything("stdin")
+        dirname = path.dirname(__file__)
+        self.vip_dir = path.join(dirname, "fixtures", "test1", ".vip")
 
-            # Assert that stdin is closed
-            self.popen_mock.stdin.close()
+        (subprocess
+            .Popen([EndsWith("test1/.vip/bin/command"), "-arg", "123"],
+                   stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
+                   stdin=subprocess.PIPE)
+            .AndReturn(self.popen_mock))
 
-            dirname = path.dirname(__file__)
-            self.vip_dir = path.join(dirname, "fixtures", "test1", ".vip")
+    def tearDown(self):
+        self.mox.ResetAll()
+        self.mox.UnsetStubs()
 
-            (subprocess
-                .Popen([EndsWith("test1/.vip/bin/command"), "-arg", "123"],
-                       stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
-                       stdin=subprocess.PIPE)
-                .AndReturn(self.popen_mock))
+    def test_should_raise_VipError_when_command_is_not_found(self):
 
-        def tearDown(self):
-            self.mox.ResetAll()
-            self.mox.UnsetStubs()
+        with self.assertRaisesRegexp(core.VipError, "not found"):
+            core.execute_virtualenv_command("missing/.vip", "command", [])
 
-        def test_should_raise_VipError_when_command_is_not_found(self):
+    def test_should_call_command(self):
+        self.popen_mock.communicate()
+        self.mox.ReplayAll()
 
-            with self.assertRaisesRegexp(core.VipError, "not found"):
-                core.execute_virtualenv_command("missing/.vip", "command", [])
+        core.execute_virtualenv_command(self.vip_dir, "command",
+                                        ["-arg", "123"])
 
-        def test_should_call_command(self):
-            self.popen_mock.communicate()
-            self.mox.ReplayAll()
+        self.mox.VerifyAll()
 
+    def test_should_raise_VipError_when_CalledProcessError_is_found(self):
+        (self.popen_mock.communicate()
+            .AndRaise(subprocess.CalledProcessError(1, "error")))
+        self.mox.ReplayAll()
+
+        with self.assertRaises(core.VipError):
             core.execute_virtualenv_command(self.vip_dir, "command",
                                             ["-arg", "123"])
 
-            self.mox.VerifyAll()
-
-        def test_should_raise_VipError_when_CalledProcessError_is_found(self):
-            (self.popen_mock.communicate()
-                .AndRaise(subprocess.CalledProcessError(1, "error")))
-            self.mox.ReplayAll()
-
-            with self.assertRaises(core.VipError):
-                core.execute_virtualenv_command(self.vip_dir, "command",
-                                                ["-arg", "123"])
-
-            self.mox.VerifyAll()
+        self.mox.VerifyAll()

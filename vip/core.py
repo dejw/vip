@@ -12,6 +12,8 @@ from os import path
 VIP_DIRECTORY = ".vip"
 REQUIREMENTS_FILENAME = 'requirements.txt'
 
+is_win = sys.platform.startswith("win")
+
 
 class _Logger(object):
     def __init__(self):
@@ -133,7 +135,7 @@ def execute_virtualenv_command(vip_directory, command, args):
         VipError: when command is not found or cannot be executed
     """
 
-    if os.name == 'nt':
+    if is_win:
         cmd_path = path.join(vip_directory, "Scripts", command)
         executable_path = find_win_cmd(cmd_path)
         if executable_path is None:
