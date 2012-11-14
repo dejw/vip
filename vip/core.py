@@ -13,7 +13,6 @@ from os import path
 VIP_DIRECTORY = ".vip"
 REQUIREMENTS_FILENAME = 'requirements.txt'
 
-
 class _Logger(object):
 
     def __init__(self):
@@ -108,6 +107,28 @@ def create_virtualenv(directory=".", install_requirements=True):
     return vip_directory
 
 
+def find_win_cmd(fpath):
+    """ Given a filepath, determine try to resolve the file path of the matching
+    executable on Windows.
+
+    Returns:
+        A path to the correct executable path, or the original filepath if none
+        were found.
+    """
+    if path.exists(fpath) and path.isfile(fpath):
+        return fpath
+    pathextval = os.environ["PATHEXT"].lower() \
+        if os.environ.has_key("PATHEXT") \
+        else ".exe;.cmd;.bat;.py;.pyw"
+    pathexts = filter(lambda v: len(v) > 0,
+        [ v.strip() for v in pathextval.split(';') ])
+    for ext in pathexts:
+        exepath = fpath + ext
+        if path.exists(exepath) and path.isfile(exepath):
+            return exepath
+    return None
+
+
 def execute_virtualenv_command(vip_directory, command, args):
     """ Executes a vip_directory/bin/command executable with given arguments
 
@@ -115,9 +136,15 @@ def execute_virtualenv_command(vip_directory, command, args):
         VipError: when command is not found or cannot be executed
     """
 
-    executable_path = path.join(vip_directory, "bin", command)
-    if not path.exists(executable_path) or not is_exe(executable_path):
-        raise VipError("%s not found or is not executable" % executable_path)
+    if os.name == 'nt':
+        cmd_path = path.join(vip_directory, "Scripts", command)
+        executable_path = find_win_cmd(cmd_path)
+        if executable_path is None:
+            raise VipError("%s not found or is not executable" % cmd_path)
+    else:
+        executable_path = path.join(vip_directory, "bin", command)
+        if not path.exists(executable_path) or not is_exe(executable_path):
+            raise VipError("%s not found or is not executable" % executable_path)
 
     try:
         arguments = [executable_path] + args
