@@ -106,8 +106,8 @@ def create_virtualenv(directory=".", install_requirements=True):
 
 
 def find_win_cmd(fpath):
-    """ Given a filepath, determine try to resolve the file path of the matching
-    executable on Windows.
+    """ Given a filepath, determine try to resolve the file path of the
+    matching executable on Windows.
 
     Returns:
         A path to the correct executable path, or None if none found.
