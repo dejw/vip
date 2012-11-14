@@ -55,11 +55,14 @@ if osname == 'nt':
     class TestWindowsVipDirectoryFinder(unittest.TestCase):
 
         def setUp(self):
-            drive, folderpath = path.splitdrive(path.abspath(path.dirname(__file__)))
+            drive, folderpath = path.splitdrive(
+                path.abspath(path.dirname(__file__)))
 
-            # The test root folder with a backslash following the drive letter. (C:\\)
+            # The test root folder with a backslash following the drive letter.
+            # In normal circumstances, C:\
             self.rootbs = path.join(drive, '\\' + folderpath[1:])
-            # The test root folder with a slash following the drive letter. (C:/)
+            # The test root folder with a slash following the drive letter.
+            # In normal circumstances, C:/
             self.rootfs = path.join(drive, '/' + folderpath[1:])
 
         def test_should_return_absolute_path_to_vip_directory_backslash(self):
@@ -78,17 +81,15 @@ if osname == 'nt':
 
         def test_should_skip_vip_which_is_no_directory_backslash(self):
             root = path.join(self.rootbs, "fixtures", "test2")
-
-            directory = core.find_vip_directory(start=path.join(root,
-                                                                "with_plain_file"))
+            start = path.join(root, "with_plain_file")
+            directory = core.find_vip_directory(start=start)
             vip_folder = path.abspath(path.join(root, ".vip"))
             self.assertEqual(vip_folder, directory)
 
         def test_should_skip_vip_which_is_no_directory_slash(self):
             root = path.join(self.rootfs, "fixtures", "test2")
-
-            directory = core.find_vip_directory(start=path.join(root,
-                                                                "with_plain_file"))
+            start = path.join(root, "with_plain_file")
+            directory = core.find_vip_directory(start=start)
             vip_folder = path.abspath(path.join(root, ".vip"))
             self.assertEqual(vip_folder, directory)
 
@@ -103,7 +104,6 @@ if osname == 'nt':
 
             with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
                 core.find_vip_directory(start=root)
-
 
     class TestWindowsCommandExecution(unittest.TestCase):
 
@@ -120,9 +120,9 @@ if osname == 'nt':
 
             dirname = path.dirname(__file__)
             self.vip_dir = path.join(dirname, "fixtures", "test4", ".vip")
-
+            command = "test4\\.vip\\Scripts\\command"
             (subprocess
-                .Popen([EndsWith("test4\\.vip\\Scripts\\command"), "-arg", "123"],
+                .Popen([EndsWith(command), "-arg", "123"],
                        stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
                        stdin=subprocess.PIPE)
                 .AndReturn(self.popen_mock))
