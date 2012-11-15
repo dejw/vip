@@ -137,42 +137,32 @@ class TestWindowsFindExecutable(unittest.TestCase):
                                  "Scripts")
         self.exec_ext = '.bat'
 
-    def test_should_return_valid_path_to_executable_with_extension(self):
-        base_exe = path.join(self.bin_dir, "command_with_ext")
+    def test_should_return_best_valid_executable(self, exe=None,
+                                                 expected=None):
+        base_exe = path.join(self.bin_dir, "command_with_better_executable")\
+            if exe is None else\
+            path.join(self.bin_dir, exe)
+
+        if expected is None:
+            expected = base_exe + self.exec_ext
+        else:
+            expected = path.join(self.bin_dir, expected)
 
         exe_path = core.find_windows_executable(base_exe)
-        expected = base_exe + self.exec_ext
-
-        self.assertEqual(expected, exe_path)
-        self.assertTrue(path.exists(expected) and path.isfile(expected))
-
-    def test_should_return_valid_path_to_executable_without_extension(self):
-        base_exe = path.join(self.bin_dir, "command_without_ext")
-
-        exe_path = core.find_windows_executable(base_exe)
-        expected = base_exe
-
-        self.assertEqual(expected, exe_path)
-        self.assertTrue(path.exists(expected) and path.isfile(expected))
-
-    def test_should_return_valid_path_to_best_executable(self):
-        base_exe = path.join(self.bin_dir, "command_with_better_executable")
-
-        exe_path = core.find_windows_executable(base_exe)
-        expected = base_exe + self.exec_ext
 
         self.assertEqual(expected, exe_path)
         self.assertTrue(path.exists(expected) and path.isfile(expected))
 
     def test_should_return_valid_path_with_executable_extension(self):
-        base_exe = path.join(self.bin_dir, "command_with_executable_ext" +
-                             self.exec_ext)
+        cmd = "command_with_executable_ext" + self.exec_ext
+        self.test_should_return_best_valid_executable(cmd, cmd)
 
-        exe_path = core.find_windows_executable(base_exe)
-        expected = base_exe
+    def test_should_return_valid_path_to_executable_with_extension(self):
+        self.test_should_return_best_valid_executable("command_with_ext")
 
-        self.assertEqual(expected, exe_path)
-        self.assertTrue(path.exists(expected) and path.isfile(expected))
+    def test_should_return_valid_path_to_executable_without_extension(self):
+        self.test_should_return_best_valid_executable("command_without_ext",
+                                                      "command_without_ext")
 
     def test_should_raise_VipError_when_no_executable_is_found(self):
         base_exe = path.join(self.bin_dir, "missing")
