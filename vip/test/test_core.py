@@ -83,15 +83,15 @@ class TestCommandExecution(unittest.TestCase):
         self.popen_mock.stdin.close()
 
         # OS-specific stuff.
-        casedir = "test4" if core.is_win else "test1"
-        bindir = "Scripts" if core.is_win else "bin"
+        case_dir = "test4" if core.is_win else "test1"
+        bin_dir = "Scripts" if core.is_win else "bin"
 
         # See TestVipDirectoryFinder for the reason behind the normpath call.
         dirname = path.normpath(path.dirname(__file__))
-        vip_dir_parts = [casedir, ".vip"]
+        vip_dir_parts = [case_dir, ".vip"]
         self.vip_dir = path.join(dirname, "fixtures", *vip_dir_parts)
 
-        command = path.sep.join(vip_dir_parts + [bindir, "command"])
+        command = path.sep.join(vip_dir_parts + [bin_dir, "command"])
         (subprocess
             .Popen([EndsWith(command), "-arg", "123"],
                    stdout=mox.IgnoreArg(), stderr=mox.IgnoreArg(),
@@ -126,3 +126,56 @@ class TestCommandExecution(unittest.TestCase):
                                             ["-arg", "123"])
 
         self.mox.VerifyAll()
+
+
+@unittest.skipUnless(core.is_win, "Windows-specific test")
+class TestWindowsFindExecutable(unittest.TestCase):
+
+    def setUp(self):
+        dirname = path.normpath(path.dirname(__file__))
+        self.bin_dir = path.join(dirname, "fixtures", "test5", ".vip",
+                                 "Scripts")
+        self.exec_ext = '.bat'
+
+    def test_should_return_valid_path_to_executable_with_extension(self):
+        base_exe = path.join(self.bin_dir, "command_with_ext")
+
+        exe_path = core.find_windows_executable(base_exe)
+        expected = base_exe + self.exec_ext
+
+        self.assertEqual(expected, exe_path)
+        self.assertTrue(path.exists(expected) and path.isfile(expected))
+
+    def test_should_return_valid_path_to_executable_without_extension(self):
+        base_exe = path.join(self.bin_dir, "command_without_ext")
+
+        exe_path = core.find_windows_executable(base_exe)
+        expected = base_exe
+
+        self.assertEqual(expected, exe_path)
+        self.assertTrue(path.exists(expected) and path.isfile(expected))
+
+    def test_should_return_valid_path_to_best_executable(self):
+        base_exe = path.join(self.bin_dir, "command_with_better_executable")
+
+        exe_path = core.find_windows_executable(base_exe)
+        expected = base_exe + self.exec_ext
+
+        self.assertEqual(expected, exe_path)
+        self.assertTrue(path.exists(expected) and path.isfile(expected))
+
+    def test_should_return_valid_path_with_executable_extension(self):
+        base_exe = path.join(self.bin_dir, "command_with_executable_ext" +
+                             self.exec_ext)
+
+        exe_path = core.find_windows_executable(base_exe)
+        expected = base_exe
+
+        self.assertEqual(expected, exe_path)
+        self.assertTrue(path.exists(expected) and path.isfile(expected))
+
+    def test_should_raise_VipError_when_no_executable_is_found(self):
+        base_exe = path.join(self.bin_dir, "missing")
+
+        with self.assertRaisesRegexp(core.VipError, "not found"):
+            core.find_windows_executable(base_exe)
