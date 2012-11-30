@@ -9,13 +9,13 @@ import virtualenv
 
 from os import path
 
-
 VIP_DIRECTORY = ".vip"
 REQUIREMENTS_FILENAME = 'requirements.txt'
 
+is_win = sys.platform.startswith("win")
+
 
 class _Logger(object):
-
     def __init__(self):
         self._logger = logging.getLogger(__name__)
         self._logger.addHandler(logging.StreamHandler())
@@ -98,14 +98,53 @@ def create_virtualenv(directory=".", install_requirements=True):
 
     # if requirements.txt exists try to install all packages
     if install_requirements:
-        requirements_file = path.join(directory, REQUIREMENTS_FILENAME)
-        if path.exists(requirements_file) and path.isfile(requirements_file):
-
-            logger.info("Installing requirements from %s" % requirements_file)
+        requirements = path.join(directory, REQUIREMENTS_FILENAME)
+        if path.exists(requirements) and path.isfile(requirements):
+            logger.info("Installing requirements from %s" % requirements)
             execute_virtualenv_command(vip_directory, "pip", ["install", "-r",
-                                       requirements_file])
+                                                              requirements])
 
     return vip_directory
+
+
+def find_windows_executable(exe_base):
+    """ Given a base filepath, try to resolve the file path to an executable
+    on Windows. If the base filepath exists and is a file, we'll return that
+    file path only if it has an executable extension, or if no other file
+    could be found.
+
+    Args:
+        exe_base: str A base filepath. Will return without searching if this
+        filepath exists and has an executable file extension.
+
+    Returns:
+        The filepath that a Window's shell would resolve, given the base.
+
+    Raises:
+        VipError: when no executable can be found.
+    """
+    ext_val = os.environ["PATHEXT"].lower()\
+        if "PATHEXT" in os.environ\
+        else ".exe;.cmd;.bat;.py;.pyw"
+    path_exts = filter(lambda v: len(v) > 0, [v.strip() for v in ext_val
+                                              .split(';')])
+    exe_exists = False
+    if path.exists(exe_base) and path.isfile(exe_base):
+        exe_ext = path.splitext(exe_base)[1].lower()
+        if exe_ext in path_exts:
+            return exe_base
+        else:
+            exe_exists = True
+
+    for ext in path_exts:
+        exe_path = exe_base + ext
+        if path.exists(exe_path) and path.isfile(exe_path):
+            return exe_path
+
+    if exe_exists:
+        return exe_base
+    else:
+        raise VipError("%s not found or is not executable" % exe_base)
 
 
 def execute_virtualenv_command(vip_directory, command, args):
@@ -115,9 +154,14 @@ def execute_virtualenv_command(vip_directory, command, args):
         VipError: when command is not found or cannot be executed
     """
 
-    executable_path = path.join(vip_directory, "bin", command)
-    if not path.exists(executable_path) or not is_exe(executable_path):
-        raise VipError("%s not found or is not executable" % executable_path)
+    if is_win:
+        executable_base = path.join(vip_directory, "Scripts", command)
+        executable_path = find_windows_executable(executable_base)
+    else:
+        executable_path = path.join(vip_directory, "bin", command)
+        if not path.exists(executable_path) or not is_exe(executable_path):
+            raise VipError(
+                "%s not found or is not executable" % executable_path)
 
     try:
         arguments = [executable_path] + args
