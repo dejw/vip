@@ -36,6 +36,7 @@ setup(
             'vip = vip.main:main',
         ]
     },
+    use_2to3=True,
     classifiers=[
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 1 - Planning',
