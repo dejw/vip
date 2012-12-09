@@ -1,14 +1,3 @@
-# Only development dependencies
 virtualenv>=1.7
-
-# Tests
-mox
-pep8
-nose
-
-# For python 2.6 and less
-argparse
-unittest2
-
-# CI
-watson-ci
+path.py
+argparse    # 2.6

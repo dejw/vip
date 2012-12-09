@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import with_statement
+
 import sys
 import os
 
 from setuptools import setup, find_packages
 
 #  Build requirements list
-requirements = ['virtualenv>=1.7', 'path.py']
-
-if sys.version_info < (2, 7):
-    requirements.append('argparse')
+with open('requirements.txt') as f:
+    requirements = [l.split('#')[0] for l in f.readlines()]
 
 
 def get_info():
