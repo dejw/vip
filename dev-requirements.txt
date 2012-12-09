@@ -1,4 +1,3 @@
 its
-mox
 pep8
 nose

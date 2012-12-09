@@ -4,7 +4,11 @@ import os
 import logging
 import path
 import signal
-import StringIO
+try:
+    import StringIO
+except ImportError:
+    import io as StringIO
+
 import subprocess
 import sys
 import virtualenv
@@ -35,7 +39,7 @@ class _Logger(object):
 logger = _Logger()
 
 
-class VipError(StandardError):
+class VipError(Exception):
     pass
 
 

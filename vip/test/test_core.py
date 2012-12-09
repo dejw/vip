@@ -2,7 +2,7 @@
 
 import its
 try:
-    import mox3 as mox
+    from mox3 import mox
 except ImportError:
     if its.py3:
         raise
@@ -14,7 +14,7 @@ import subprocess
 try:
     import unittest2 as unittest
 except ImportError:
-    if not its.py27:
+    if its.py2 and not its.py27:
         raise
     import unittest
 
@@ -29,7 +29,7 @@ class EndsWith(mox.Comparator):
         self._pattern = pattern
 
     def equals(self, rhs):
-        return isinstance(rhs, basestring) and rhs.endswith(self._pattern)
+        return hasattr(rhs, 'endswith') and rhs.endswith(self._pattern)
 
     def __repr__(self):
         return "<EndsWith %r>" % (self._pattern)
