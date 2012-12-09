@@ -3,14 +3,14 @@
 import os
 import subprocess
 import logging
+import path
 import sys
 import StringIO
 import virtualenv
 
-from os import path
-
 
 VIP_DIRECTORY = ".vip"
+DEFAULT_VIRTUALENV_DIRS = [VIP_DIRECTORY, '.venv']
 REQUIREMENTS_FILENAME = 'requirements.txt'
 
 
@@ -38,8 +38,8 @@ class VipError(StandardError):
     pass
 
 
-def is_exe(fpath):
-    return path.isfile(fpath) and os.access(fpath, os.X_OK)
+def is_exe(p):
+    return p.isfile() and p.access(os.X_OK)
 
 
 def find_vip_directory(start="."):
@@ -54,16 +54,16 @@ def find_vip_directory(start="."):
     Raises:
         VipError: when no `.vip` directory has been found to the root.
     """
-    directory, head = path.abspath(start), None
+    look_for = set(DEFAULT_VIRTUALENV_DIRS)
 
-    while (directory != "/" and directory[1:] != ':\\'
-           and directory[1:] != ':/') or head:
-        vip_directory = path.join(directory, VIP_DIRECTORY)
+    directory = path.path(start).abspath()
 
-        if path.exists(vip_directory) and path.isdir(vip_directory):
-            return vip_directory
+    while directory.parent != directory:
+        items = os.listdir(directory)
+        if any(i in look_for and (directory / i).isdir() for i in items):
+            return directory / VIP_DIRECTORY
 
-        directory, head = path.split(directory)
+        directory = directory.parent
 
     raise VipError(
         "not a virtualenv (or any of the parent directories): %s" % start)
@@ -79,13 +79,15 @@ def create_virtualenv(directory=".", install_requirements=True):
         VipError: when installation cannot be finished
     """
 
+    directory = path.path(directory)
+
     try:
         vip_directory = find_vip_directory(directory)
     except VipError:
-        vip_directory = path.abspath(path.join(directory, ".vip"))
+        vip_directory = (path.path(directory) / VIP_DIRECTORY).abspath()
 
     # TODO: allow to pass additional flags to virtualenv tool
-    if not path.exists(vip_directory):
+    if not vip_directory.exists():
         virtualenv.create_environment(vip_directory)
 
     else:
@@ -93,14 +95,15 @@ def create_virtualenv(directory=".", install_requirements=True):
                        "a virtualenv" % vip_directory)
 
     # Let's assume that if .vip is directory it is also our virtualenv
-    if path.exists(vip_directory) and not path.isdir(vip_directory):
+    if vip_directory.exists() and not vip_directory.isdir():
         raise VipError("%s is not a directory" % vip_directory)
 
     # if requirements.txt exists try to install all packages
     if install_requirements:
-        requirements_file = path.join(directory, REQUIREMENTS_FILENAME)
-        if path.exists(requirements_file) and path.isfile(requirements_file):
+        # TODO(dejw): allow installing all *requirements.txt files
+        requirements_file = directory / REQUIREMENTS_FILENAME
 
+        if requirements_file.exists() and requirements_file.isfile():
             logger.info("Installing requirements from %s" % requirements_file)
             execute_virtualenv_command(vip_directory, "pip", ["install", "-r",
                                        requirements_file])
@@ -114,9 +117,10 @@ def execute_virtualenv_command(vip_directory, command, args):
     Raises:
         VipError: when command is not found or cannot be executed
     """
+    vip_directory = path.path(vip_directory)
 
-    executable_path = path.join(vip_directory, "bin", command)
-    if not path.exists(executable_path) or not is_exe(executable_path):
+    executable_path = vip_directory / "bin" / command
+    if not executable_path.exists() or not is_exe(executable_path):
         raise VipError("%s not found or is not executable" % executable_path)
 
     try:

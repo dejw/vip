@@ -8,7 +8,6 @@ try:
 except ImportError:
     import unittest
 
-
 from os import path
 
 from vip import core
@@ -45,7 +44,7 @@ class TestVipDirectoryFinder(unittest.TestCase):
         self.assertEqual(path.join(root, ".vip"), directory)
 
     def test_should_raise_VipError_when_no_vip_is_found(self):
-        root = path.join(path.dirname(__file__), "fixtures", "test3")
+        root = '/tmp'
 
         with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
             core.find_vip_directory(start=root)
