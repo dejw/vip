@@ -78,9 +78,10 @@ def main():
 
         elif args.command:
             directory = core.find_vip_directory()
-            core.execute_virtualenv_command(directory, args.command,
-                                            args.arguments)
+            return_code = core.execute_virtualenv_command(
+                directory, args.command, args.arguments)
 
+            sys.exit(return_code)
         else:
             parser.print_help()
 

@@ -130,6 +130,7 @@ def execute_virtualenv_command(vip_directory, command, args):
                              stdin=subprocess.PIPE)
         p.stdin.close()
         p.communicate()
+        return p.returncode
     except subprocess.CalledProcessError as e:
         raise VipError(str(e))
     except KeyboardInterrupt:

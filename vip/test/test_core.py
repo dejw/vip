@@ -100,3 +100,14 @@ class TestCommandExecution(unittest.TestCase):
                                             ["-arg", "123"])
 
         self.mox.VerifyAll()
+
+    def test_should_propagate_status_code(self):
+        self.popen_mock.communicate()
+        self.popen_mock.returncode = 123
+        self.mox.ReplayAll()
+
+        code = core.execute_virtualenv_command(self.vip_dir, 'command',
+                                               ["-arg", "123"])
+
+        self.mox.VerifyAll()
+        self.assertEqual(123, code)
