@@ -23,6 +23,8 @@ No need to source `bin/activate` any more!
 
 ## Usage
 
+_Note that some of the features described here are not implmented yet (see [Issues](https://github.com/dejw/vip/issues?state=open) for details)_
+
 Initialization of a brand new virtual environment is as simple as typing:
 
     vip --init [directory]
