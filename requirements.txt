@@ -3,7 +3,12 @@ virtualenv>=1.7
 
 # Tests
 mox
+pep8
+nose
 
 # For python 2.6 and less
 argparse
 unittest2
+
+# CI
+watson-ci

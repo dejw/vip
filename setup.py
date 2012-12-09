@@ -6,7 +6,7 @@ import os
 from setuptools import setup, find_packages
 
 #  Build requirements list
-requirements = ['virtualenv>=1.7']
+requirements = ['virtualenv>=1.7', 'path.py']
 
 if sys.version_info < (2, 7):
     requirements.append('argparse')
