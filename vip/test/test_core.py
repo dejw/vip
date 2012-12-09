@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import its
-import mox
+try:
+    import mox3 as mox
+except ImportError:
+    if its.py3:
+        raise
+    import mox
 import os
 import signal
 import subprocess
