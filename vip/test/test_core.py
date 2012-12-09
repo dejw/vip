@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import its
 import mox
 import os
 import signal
@@ -8,6 +9,8 @@ import subprocess
 try:
     import unittest2 as unittest
 except ImportError:
+    if not its.py27:
+        raise
     import unittest
 
 from os import path
