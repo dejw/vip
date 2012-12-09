@@ -53,7 +53,7 @@ def create_argument_parser():
 def main():
     parser, args = create_argument_parser()
 
-    commands = ['init', 'locate', 'command']
+    commands = ["init", "locate", "command"]
 
     # Configure logger using --verbose option
     core.logger.verbose = bool(args.verbose)
@@ -61,7 +61,7 @@ def main():
     with protect_from_VipError():
 
         if args.version:
-            print vip.VERSION
+            sys.stdout.write("%s\n" % vip.VERSION)
             sys.exit(0)
 
         # Check for only one command
@@ -74,7 +74,7 @@ def main():
             core.logger.info("Initialized virtualenv in %s" % directory)
 
         elif args.locate:
-            print core.find_vip_directory(args.locate)
+            sys.stdout.write(core.find_vip_directory(args.locate) + "\n")
 
         elif args.command:
             directory = core.find_vip_directory()

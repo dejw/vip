@@ -1,24 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import its
-try:
-    from mox3 import mox
-except ImportError:
-    if its.py3:
-        raise
-    import mox
+from __future__ import absolute_import
+
 import os
 import signal
 import subprocess
 
-try:
-    import unittest2 as unittest
-except ImportError:
-    if its.py2 and not its.py27:
-        raise
-    import unittest
-
 from os import path
+
+from .test_helper import mox
+from .test_helper import unittest
 
 from vip import core
 
