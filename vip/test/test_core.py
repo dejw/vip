@@ -164,9 +164,11 @@ class TestWindowsFindExecutable(unittest.TestCase):
 
     def test_should_return_best_valid_executable(self, exe=None,
                                                  expected=None):
-        base_exe = path.join(self.bin_dir, "command_with_better_executable")\
-            if exe is None else\
-            path.join(self.bin_dir, exe)
+        if exe is None:
+            base_exe = path.join(self.bin_dir,
+                                 "command_with_better_executable")
+        else:
+            base_exe = path.join(self.bin_dir, exe)
 
         if expected is None:
             expected = base_exe + self.exec_ext
