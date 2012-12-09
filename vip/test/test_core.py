@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import mox
+import os
+import signal
 import subprocess
 
 try:
@@ -83,6 +85,7 @@ class TestCommandExecution(unittest.TestCase):
 
     def test_should_call_command(self):
         self.popen_mock.communicate()
+        self.popen_mock.poll().AndReturn(0)
         self.mox.ReplayAll()
 
         core.execute_virtualenv_command(self.vip_dir, "command",
@@ -93,6 +96,7 @@ class TestCommandExecution(unittest.TestCase):
     def test_should_raise_VipError_when_CalledProcessError_is_found(self):
         (self.popen_mock.communicate()
             .AndRaise(subprocess.CalledProcessError(1, "error")))
+        self.popen_mock.poll().AndReturn(127)
         self.mox.ReplayAll()
 
         with self.assertRaises(core.VipError):
@@ -103,6 +107,7 @@ class TestCommandExecution(unittest.TestCase):
 
     def test_should_propagate_status_code(self):
         self.popen_mock.communicate()
+        self.popen_mock.poll().AndReturn(123)
         self.popen_mock.returncode = 123
         self.mox.ReplayAll()
 
@@ -111,3 +116,14 @@ class TestCommandExecution(unittest.TestCase):
 
         self.mox.VerifyAll()
         self.assertEqual(123, code)
+
+    def test_should_propagate_SIGINT(self):
+        self.popen_mock.communicate().AndRaise(KeyboardInterrupt())
+        self.popen_mock.poll().AndReturn(None)
+        self.popen_mock.terminate()
+        self.mox.ReplayAll()
+
+        code = core.execute_virtualenv_command(self.vip_dir, 'command',
+                                               ["-arg", "123"])
+
+        self.mox.VerifyAll()

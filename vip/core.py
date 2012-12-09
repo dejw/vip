@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import subprocess
 import logging
 import path
-import sys
+import signal
 import StringIO
+import subprocess
+import sys
 import virtualenv
 
 
@@ -123,16 +124,18 @@ def execute_virtualenv_command(vip_directory, command, args):
     if not executable_path.exists() or not is_exe(executable_path):
         raise VipError("%s not found or is not executable" % executable_path)
 
-    try:
-        arguments = [executable_path] + args
+    arguments = [executable_path] + args
+    p = subprocess.Popen(arguments, stdout=sys.stdout, stderr=sys.stderr,
+                         stdin=subprocess.PIPE)
 
-        p = subprocess.Popen(arguments, stdout=sys.stdout, stderr=sys.stderr,
-                             stdin=subprocess.PIPE)
+    try:
         p.stdin.close()
         p.communicate()
         return p.returncode
     except subprocess.CalledProcessError as e:
         raise VipError(str(e))
     except KeyboardInterrupt:
-        # Ignore keyboard interrupt here
         pass
+    finally:
+        if p.poll() is None:
+            p.terminate()
