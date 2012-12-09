@@ -1,1 +1,1 @@
--e https://github.com/quermit/pymox.git@mox3_init#egg=mox3
+-e git+git://github.com/quermit/pymox.git@mox3_init#egg=mox3
