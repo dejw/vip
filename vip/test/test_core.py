@@ -218,7 +218,7 @@ class TestCreateVirtualenv(unittest.TestCase):
         self.mox.StubOutWithMock(core, 'execute_virtualenv_command')
         core.execute_virtualenv_command(
             vip_dir, 'pip',
-            ['install', '-r', path.join(repo_dir, 'requirements.txt')]).AndReturn(0)
+            ['install', '-r', path.join(repo_dir, 'requirements.txt')])
 
         self.mox.ReplayAll()
         self.mox.StubOutWithMock(core, 'logger', use_mock_anything=True)
