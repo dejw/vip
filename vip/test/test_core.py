@@ -229,25 +229,3 @@ class TestCreateVirtualenv(unittest.TestCase):
         mox.Reset(core.logger)
         self.mox.VerifyAll()
         self.assertEqual(vip_dir, dir_)
-
-
-class TestGetRequirementsFilenames(unittest.TestCase):
-
-    def test_empty(self):
-        names = list(core.get_requirements_filenames('', ''))
-
-        self.assertEqual(['requirements.txt'], names)
-
-    def test_prefix_and_version(self):
-        names = list(core.get_requirements_filenames('devel', (2, 7, 3)))
-
-        self.assertEqual([
-            'requirements.txt',
-            'requirements-2.txt',
-            'requirements-27.txt',
-            'requirements-273.txt',
-            'devel-requirements.txt',
-            'devel-requirements-2.txt',
-            'devel-requirements-27.txt',
-            'devel-requirements-273.txt',
-        ], names)
