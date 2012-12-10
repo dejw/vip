@@ -209,12 +209,12 @@ class TestGetRequirementsFilenames(unittest.TestCase):
         names = list(core.get_requirements_filenames('devel', (2, 7, 3)))
 
         self.assertEqual([
-              'requirements.txt',
-              'requirements-2.txt',
-              'requirements-27.txt',
-              'requirements-273.txt',
-        'devel-requirements.txt',
-        'devel-requirements-2.txt',
-        'devel-requirements-27.txt',
-        'devel-requirements-273.txt'
+            'requirements.txt',
+            'requirements-2.txt',
+            'requirements-27.txt',
+            'requirements-273.txt',
+            'devel-requirements.txt',
+            'devel-requirements-2.txt',
+            'devel-requirements-27.txt',
+            'devel-requirements-273.txt',
         ], names)
