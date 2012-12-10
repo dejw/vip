@@ -140,16 +140,16 @@ def find_windows_executable(exe_base):
     path_exts = filter(lambda v: len(v) > 0, [v.strip() for v in ext_val
                                               .split(';')])
     exe_exists = False
-    if path.exists(exe_base) and path.isfile(exe_base):
-        exe_ext = path.splitext(exe_base)[1].lower()
+    if exe_base.exists() and exe_base.isfile():
+        exe_ext = exe_base.splitext()[-1].lower()
         if exe_ext in path_exts:
             return exe_base
         else:
             exe_exists = True
 
     for ext in path_exts:
-        exe_path = exe_base + ext
-        if path.exists(exe_path) and path.isfile(exe_path):
+        exe_path = path.path(exe_base + ext)
+        if exe_path.exists() and exe_path.isfile():
             return exe_path
 
     if exe_exists:
