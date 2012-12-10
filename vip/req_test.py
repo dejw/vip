@@ -89,7 +89,9 @@ class TestFindRequirements(test_helper.TestBase):
                                        version).AndReturn(names)
 
         self.mox.StubOutWithMock(pip_req, 'parse_requirements')
-        pip_req.parse_requirements('requirements.txt').AndReturn(requirements)
+        pip_req.parse_requirements(
+            'requirements.txt',
+            options=mox.IgnoreArg()).AndReturn(requirements)
         self.mox.ReplayAll()
 
         reqs = req.find_requirements(source_dir, prefix, version)

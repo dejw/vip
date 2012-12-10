@@ -7,13 +7,10 @@ import os
 
 from setuptools import setup, find_packages
 
-#  Build requirements list
-with open('requirements.txt') as f:
-    requirements = [l.split('#')[0] for l in f.readlines()]
-
+import vip
+import vip.req
 
 def get_info():
-    import vip
     return vip.VERSION, vip.__doc__.strip()
 
 version, long_description = get_info()
@@ -30,7 +27,7 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     platforms='any',
-    install_requires=requirements,
+    install_requires=vip.req.find_requirements(),
     entry_points={
         'console_scripts': [
             'vip = vip.main:main',

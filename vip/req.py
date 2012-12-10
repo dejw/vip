@@ -72,11 +72,16 @@ def find_requirements(source_dir=None, prefix=None, version=None):
         a list of requiremnets
     """
 
+    class FakeOptions(object):
+        skip_requirements_regex = None
+        default_vcs = ''
+
     reqs = []
 
     for filename in get_requirements_filenames(source_dir, prefix, version):
         if os.path.exists(filename):
-            for install_req in req.parse_requirements(filename):
+            for install_req in req.parse_requirements(filename,
+                                                      options=FakeOptions()):
                 reqs.append(str(install_req.req))
 
     return reqs
