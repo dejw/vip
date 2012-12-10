@@ -134,6 +134,8 @@ def find_windows_executable(exe_base):
     Raises:
         VipError: when no executable can be found.
     """
+    exe_base = path.path(exe_base)
+
     ext_val = os.environ["PATHEXT"].lower()\
         if "PATHEXT" in os.environ\
         else ".exe;.cmd;.bat;.py;.pyw"
