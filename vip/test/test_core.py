@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import os
 import signal
+import sys
 import subprocess
 import virtualenv
 
@@ -35,6 +36,7 @@ class TestVipDirectoryFinder(unittest.TestCase):
         # purpose of this test, though, we want to use the OS's native file
         # paths.
         self.root = path.normpath(path.dirname(__file__))
+        self.not_a_virtualenv = '/tmp'
 
     def test_should_return_absolute_path_to_vip_directory(self):
         start = path.join(self.root, "fixtures", "test1", "..",
@@ -53,10 +55,9 @@ class TestVipDirectoryFinder(unittest.TestCase):
         self.assertEqual(expected, directory)
 
     def test_should_raise_VipError_when_no_vip_is_found(self):
-        root = '/tmp'
-
+        not_a_virtualenv = os.path.splitdrive(sys.executable)[0] + os.path.sep
         with self.assertRaisesRegexp(core.VipError, "not a virtualenv"):
-            core.find_vip_directory(start=root)
+            core.find_vip_directory(start=not_a_virtualenv)
 
 
 @unittest.skipUnless(core.is_win, "Windows-specific test")
