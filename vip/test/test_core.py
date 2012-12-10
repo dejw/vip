@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import os
 import signal
 import subprocess
+import virtualenv
 
 from os import path
 
@@ -196,6 +197,36 @@ class TestWindowsFindExecutable(unittest.TestCase):
 
         with self.assertRaisesRegexp(core.VipError, "not found"):
             core.find_windows_executable(base_exe)
+
+
+class TestCreateVirtualenv(unittest.TestCase):
+
+    def setUp(self):
+        self.mox = mox.Mox()
+
+    def tearDown(self):
+        self.mox.ResetAll()
+        self.mox.UnsetStubs()
+
+    def test_create_virtualenv(self):
+        repo_dir = path.normpath(path.join(path.dirname(__file__), '..', '..'))
+        vip_dir = path.join(repo_dir, '.vip')
+
+        self.mox.StubOutWithMock(virtualenv, 'create_environment')
+
+        self.mox.StubOutWithMock(core, 'execute_virtualenv_command')
+        core.execute_virtualenv_command(
+            vip_dir, 'pip',
+            ['install', '-r', path.join(repo_dir, 'requirements.txt')]).AndReturn(0)
+
+        self.mox.ReplayAll()
+        self.mox.StubOutWithMock(core, 'logger', use_mock_anything=True)
+
+        dir_ = core.create_virtualenv(repo_dir)
+
+        mox.Reset(core.logger)
+        self.mox.VerifyAll()
+        self.assertEqual(vip_dir, dir_)
 
 
 class TestGetRequirementsFilenames(unittest.TestCase):

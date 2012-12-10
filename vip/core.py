@@ -112,8 +112,8 @@ def create_virtualenv(directory=".", install_requirements=True):
 
         if requirements_file.exists() and requirements_file.isfile():
             logger.info("Installing requirements from %s" % requirements_file)
-            execute_virtualenv_command(vip_directory, "pip", ["install", "-r",
-                                                              requirements])
+            execute_virtualenv_command(vip_directory, "pip",
+                                       ["install", "-r", requirements_file])
 
     return vip_directory
 
