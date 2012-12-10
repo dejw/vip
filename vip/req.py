@@ -3,7 +3,8 @@
 import itertools
 import os
 import sys
-import pip
+
+from pip import req
 
 
 def get_requirements_filenames(source_dir=None, prefix=None, version=None,
@@ -75,7 +76,7 @@ def find_requirements(source_dir=None, prefix=None, version=None):
 
     for filename in get_requirements_filenames(source_dir, prefix, version):
         if os.path.exists(filename):
-            for install_req in parse_requirements(filename):
-                reqs.append(install_req.req)
+            for install_req in req.parse_requirements(filename):
+                reqs.append(str(install_req.req))
 
     return reqs

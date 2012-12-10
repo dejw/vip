@@ -2,6 +2,8 @@
 
 import sys
 
+from pip import req as pip_req
+from .test import test_helper
 from .test.test_helper import mox
 from .test.test_helper import unittest
 
@@ -68,6 +70,32 @@ class TestGetRequirementsFilenames(unittest.TestCase):
             '/tmp/requirements.txt',
             '/tmp/requirements-2.txt',
         ], names)
+
+
+class TestFindRequirements(test_helper.TestBase):
+
+    def test_simple(self):
+        prefix = 'prefix'
+        version = 'version'
+        source_dir = 'source dir'
+        names = ['requirements.txt']
+        requirements = [
+            pip_req.InstallRequirement.from_line('some-package>1'),
+            pip_req.InstallRequirement.from_line('other-package'),
+        ]
+
+        self.mox.StubOutWithMock(req, 'get_requirements_filenames')
+        req.get_requirements_filenames(source_dir, prefix,
+                                       version).AndReturn(names)
+
+        self.mox.StubOutWithMock(pip_req, 'parse_requirements')
+        pip_req.parse_requirements('requirements.txt').AndReturn(requirements)
+        self.mox.ReplayAll()
+
+        reqs = req.find_requirements(source_dir, prefix, version)
+
+        self.mox.VerifyAll()
+        self.assertEqual(['some-package>1', 'other-package'], reqs)
 
 
 if __name__ == '__main__':
