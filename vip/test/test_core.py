@@ -209,7 +209,8 @@ class TestCreateVirtualenv(unittest.TestCase):
         self.mox.UnsetStubs()
 
     def test_create_virtualenv(self):
-        repo_dir = path.normpath(path.join(path.dirname(__file__), '..', '..'))
+        repo_dir = path.normpath(path.join(path.dirname(__file__),
+                                 'fixtures', 'test1'))
         vip_dir = path.join(repo_dir, '.vip')
 
         self.mox.StubOutWithMock(virtualenv, 'create_environment')
