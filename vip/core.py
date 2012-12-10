@@ -225,7 +225,7 @@ def get_requirements_filenames(prefix=None, version=None, extension='txt'):
         prefixes.append('%s-' % prefix)
 
     version = os.version_info if version is None else version
-    version = map(str, version)
+    version = [str(v) for v in version]
     version = [''] + ['-%s' % ''.join(version[:i + 1])
                       for i, v in enumerate(version) if v]
 
