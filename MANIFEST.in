@@ -1,1 +1,1 @@
-include README.markdown requirements.txt dev-requirements.txt
+include README.markdown *requirements*.txt

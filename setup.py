@@ -8,12 +8,21 @@ import os
 from setuptools import setup, find_packages
 
 import vip
-import vip.req
+
+try:
+    from deps import find_requirements
+except ImportError:
+    import urllib
+    urllib.urlretrieve('https://raw.github.com/dejw/deps/master/deps.py', 'deps.py')
+    from deps import find_requirements
+
 
 def get_info():
     return vip.VERSION, vip.__doc__.strip()
 
+
 version, long_description = get_info()
+
 
 setup(
     name='vip',
@@ -27,7 +36,7 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     platforms='any',
-    install_requires=vip.req.find_requirements(),
+    install_requires=find_requirements(),
     entry_points={
         'console_scripts': [
             'vip = vip.main:main',
